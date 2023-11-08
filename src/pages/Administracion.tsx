@@ -1,8 +1,10 @@
+import ProductTable from "../components/ProductTable/ProductTable.tsx";
+
 const Administracion = () => {
     return (
-        <div>
-            Administracion
-        </div>
+        <>
+            <ProductTable/>
+        </>
     )
 }
 export default Administracion
