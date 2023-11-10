@@ -5,6 +5,8 @@ import * as Yup from "yup";
 import {useFormik} from "formik";
 import Form from "react-bootstrap/Form";
 import {ProductService} from "../../services/ProductService.ts";
+import {toast} from "react-toastify";
+import React from "react";
 
 type ProductModalProps = {
     show: boolean;
@@ -12,9 +14,10 @@ type ProductModalProps = {
     title: string;
     modalType: ModalType;
     prod: Product;
+    refreshData: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
-const ProductModal = ({show, onHide, title, modalType, prod}: ProductModalProps) => {
+const ProductModal = ({show, onHide, title, modalType, prod, refreshData}: ProductModalProps) => {
     const handleSaveUpdate = async (pro:Product) => {
         try {
             const isNew = prod.id === 0;
@@ -23,11 +26,30 @@ const ProductModal = ({show, onHide, title, modalType, prod}: ProductModalProps)
             }else {
                 await ProductService.updateProduct(pro.id,pro);
             }
+            toast.success(isNew ? "Producto creado":"Producto actualizado", {
+                position: "top-center",
+            });
             onHide();
+            refreshData(prevState => !prevState);
         } catch (error) {
             console.error(error);
+            toast.error("Ha ocurrido un error");
         }
     };
+    const handleDelete = async () => {
+        try {
+            await ProductService.deleteProduct(prod.id);
+            toast.success("Producto eliminado con éxito", {
+                position: "top-center",
+            });
+            onHide();
+            refreshData(prevState => !prevState);
+        }catch (error) {
+            console.error(error);
+            toast.error("Ha ocurrido un error");
+        }
+
+    }
     const validationSchema = () => {
         return Yup.object().shape({
             id: Yup.number().integer().min(0),
@@ -48,7 +70,22 @@ const ProductModal = ({show, onHide, title, modalType, prod}: ProductModalProps)
     return (
         <>
             {modalType === ModalType.DELETE ? (
-                <></>
+                <>
+                   <Modal show={show} onHide={onHide} centered backdrop="static">
+                       <Modal.Header closeButton>
+                           <Modal.Title> {title} </Modal.Title>
+                       </Modal.Header>
+                       <Modal.Body>
+                           <p>¿Está seguro que desea eliminar el producto?<br/>
+                               <strong> {prod.title} </strong>?</p>
+                       </Modal.Body>
+                       <Modal.Footer>
+                           <Button variant="secondary" onClick={onHide}> Cancelar </Button>
+                           <Button variant="danger" onClick={handleDelete}> Eliminar </Button>
+                       </Modal.Footer>
+
+                   </Modal>
+                </>
             )  : (
                 <>
                     <Modal show={show} onHide={onHide} centered backdrop="static" className="modal-x1">

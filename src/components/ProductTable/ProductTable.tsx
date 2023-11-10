@@ -5,11 +5,14 @@ import Loader from "../Loader/Loader.tsx";
 import {Button, Table} from "react-bootstrap";
 import {ModalType} from "../../types/ModalType.ts";
 import ProductModal from "../ProductModal/ProductModal.tsx";
+import EditButton from "../EditButton/EditButton.tsx";
+import DeleteButton from "../DeleteButton/DeleteButton.tsx";
 
 
 const ProductTable = () => {
     const[products, setProducts] = useState<Product[]>([]);
     const[isLoading, setIsLoading] = useState(true);
+    const[refreshData, setRefreshData] = useState(false);
     useEffect(() => {
         const fetchProducts = async () => {
             const products = await  ProductService.getProducts();
@@ -17,7 +20,7 @@ const ProductTable = () => {
             setIsLoading(false);
         };
         fetchProducts();
-    }, []);
+    }, [refreshData]);
     console.log(JSON.stringify(products, null, 2));
     const initializableNewProduct = (): Product => {
         return {
@@ -51,6 +54,8 @@ const ProductTable = () => {
                             <th> Descripcion </th>
                             <th> Categoria </th>
                             <th> Imagen </th>
+                            <th> Editar </th>
+                            <th> Borrar </th>
                         </tr>
                     </thead>
                     <tbody>
@@ -61,6 +66,8 @@ const ProductTable = () => {
                                 <td>{product.description}</td>
                                 <td>{product.category}</td>
                                  <td><img src={product.image} alt={product.title} style={{ width: '50px' }} /></td>
+                                 <td><EditButton onClick={() => handleClick("Editar Producto", product, ModalType.UPDATE)} /></td>
+                                 <td><DeleteButton onClick={() => handleClick("Borrar Producto", product, ModalType.DELETE)} /></td>
                              </tr>
                         ))}
                     </tbody>
@@ -73,6 +80,7 @@ const ProductTable = () => {
                     title={title}
                     modalType={modalType}
                     prod={product}
+                    refreshData={setRefreshData}
                     />
             )}
         </>
