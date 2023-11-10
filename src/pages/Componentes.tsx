@@ -4,11 +4,11 @@ import ButtonColorPick from "../components/ButtonColorPick/ButtonColorPick.tsx";
 
 const Componentes = () => {
     return (
-        <div>
+        <>
             <DangerInput/>
             <AlertMessage/>
             <ButtonColorPick/>
-        </div>
+        </>
     )
 }
 export default Componentes
